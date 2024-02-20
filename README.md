@@ -34,3 +34,7 @@ The system is deployed on AWS, utilizing various services to process and analyze
 
 	e) __Real-time Traffic Visualization Web Application__: A S3 bucket is configured for static website hosting. A HTML file is used for visualizing real-time traffic data using D3.js. The application fetches traffic data from a JSON file stored in the same Amazon S3 bucket, creates dynamic line plots for each detector (Paris ID), and displays them on the web page. 
 	* You can access the daily batch predictions on th [S3 Website](http://traffiq-paris.s3-website.eu-north-1.amazonaws.com/)
+
+3. __AWS EventBridge Trigger for EC2 Instance Stop__
+
+	This Lambda function is designed to stop the running EC2 instance upon receiving an event trigger from AWS EventBridge. The function is stop after the daily inference task is complete and automated to avoid unnecessary EC2 costs.
