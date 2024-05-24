@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraffIQ Paris</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Fact Sheet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        ul {
+            margin-top: 0;
+            padding-left: 20px;
+        }
+
+        .container {
+            width: 30%;
+            /* Set width to 49% for two plots in one row */
+            display: inline-block;
+            /* Allow wrapping of elements */
+            margin: 1%;
+            /* Add margin for spacing */
+            border: 100% solid #ccc;
+            /* Add border */
+        }
+
+        .legend-label {
+            margin-left: 10%;
+            font-size: 85%;
+
+            /* Add margin between line marker and labels */
+        }
+
+        .axis-label {
+            font-size: 85%;
+            font-family: Arial, sans-serif;
+            /* Use Arial font */
+        }
+
+        .tick text {
+            font-size: 95%;
+            /* Adjust tick label font size */
+            font-family: Arial, sans-serif;
+            /* Use Arial font */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="fact-sheet">
+        <h1>TraffIQ: Traffic Intelligence</h1>
+    </div>
+    <div id="plots"></div>
+    <script>
+        function createPlots() {
+            // Get the width and height of the viewport
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+            // fetch("/data")
+            fetch("data.json")
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(plotData => {
+                        const container = document.createElement('div');
+                        container.classList.add('container'); // Add container class
+
+                        const svgWidth = "100%"; // Set SVG width as a percentage of the container
+                        const svgHeight = "40"; // Set SVG height as a percentage of the viewport height
+
+                        const svg = d3.create("svg")
+                            .attr("width", svgWidth)
+                            .attr("height", percentageToPixels(svgHeight, viewportHeight));
+
+                        function percentageToPixels(percentageDimentions, viewportDimension) {
+
+                            // Convert the percentage to pixels
+                            const DimensionInPixels = (percentageDimentions / 100) * viewportDimension;
+
+                            return DimensionInPixels;
+                        }
+
+                        percentageWidth = 30
+                        percentageHeight = 30
+
+                        // Convert the percentage to pixels
+                        const widthInPixels = percentageToPixels(percentageWidth, viewportWidth);
+                        const heightInPixels = percentageToPixels(percentageHeight, viewportHeight)
+
+                        const margin = {
+                            top: percentageToPixels(5, viewportHeight),
+                            right: percentageToPixels(0.5, viewportWidth),
+                            bottom: percentageToPixels(2, viewportHeight),
+                            left: percentageToPixels(5, viewportWidth)
+                        };
+                        const width = widthInPixels - margin.left - margin.right;
+                        const height = heightInPixels - margin.top - margin.bottom;
+
+
+                        // Convert date-time strings to Date objects
+                        const parseDate = d3.timeParse("%d-%m-%Y:%H"); // Define your date format
+                        const xData = plotData.real_time_idx.concat(plotData.predictions_time_idx)
+                            .map(dateStr => parseDate(dateStr));
+
+                        const xScale = d3.scaleTime()
+                            .domain([d3.min(xData), d3.max(xData)])
+                            .range([margin.left, width + margin.left]);
+
+                        const yScale = d3.scaleLinear()
+                            // .domain([0, d3.max(plotData.real_q.concat(plotData.predictions_preds))])
+                            .domain([0, 8000])
+                            .range([height + margin.top, margin.top]);
+
+                        const xAxis = d3.axisBottom(xScale).ticks(6).tickFormat(d3.timeFormat("%d-%m %H:%M")); // Set number of ticks and format
+                        const yAxis = d3.axisLeft(yScale).ticks(5); // Set number of ticks
+
+                        // Draw x axis
+                        svg.append("g")
+                            .attr("transform", `translate(0, ${height + margin.top})`)
+                            .call(xAxis)
+                            .selectAll("text")
+                            .style("text-anchor", "end")
+                            .attr("dx", "-.8em")
+                            .attr("dy", ".15em")
+                            .attr("transform", "rotate(-45)");
+
+                        // Draw y axis
+                        svg.append("g")
+                            .attr("transform", `translate(${margin.left}, 0)`)
+                            .call(yAxis)
+
+                        // Add grid lines for x-axis
+                        svg.append("g")
+                            .attr("class", "grid")
+                            .attr("transform", `translate(0, ${height + margin.top})`)
+                            .attr("stroke-width", 1)
+                            .attr("stroke-opacity", 0.3)
+                            .call(d3.axisBottom(xScale).tickSize(-height).tickFormat(""));
+
+                        // Add grid lines for y-axis
+                        svg.append("g")
+                            .attr("class", "grid")
+                            .attr("transform", `translate(${margin.left}, 0)`)
+                            .attr("stroke-opacity", 0.3)
+                            .call(d3.axisLeft(yScale).tickSize(-width).tickFormat(""));
+
+                        const realLine = d3.line()
+                            .defined(d => d !== null) // Skip null values
+                            .x((d, i) => xScale(parseDate(plotData.real_time_idx[i])))
+                            .y(d => yScale(d));
+
+                        const predictionsLine = d3.line()
+                            .x((d, i) => xScale(parseDate(plotData.predictions_time_idx[i])))
+                            .y(d => yScale(d));
+
+                        // Define the area function for the confidence interval
+                        const predictionVariance = d3.area()
+                            .x((d, i) => xScale(parseDate(plotData.predictions_time_idx[i])))
+                            .y0((d, i) => yScale(plotData.lower_bound[i])) // Define the lower bound of the confidence interval
+                            .y1((d, i) => yScale(plotData.upper_bound[i])); // Define the upper bound of the confidence interval
+
+
+                        // Draw observed trend line
+                        svg.append("path")
+                            .datum(plotData.real_q)
+                            .attr("fill", "none")
+                            .attr("stroke", "blue")
+                            .attr("stroke-width", 2)
+                            .attr("d", realLine);
+
+                        // Draw predicted trend line
+                        svg.append("path")
+                            .datum(plotData.predictions_preds)
+                            .attr("fill", "none")
+                            .attr("stroke", "red")
+                            .attr("stroke-width", 2)
+                            .attr("d", predictionsLine);
+
+                        // Show confidence interval
+                        svg.append("path")
+                            .datum(plotData.predictions_time_idx)
+                            .attr("fill", "red")
+                            .attr("fill-opacity", 0.2) // Set opacity to 50%
+                            .attr("stroke", "none")
+                            .attr("d", predictionVariance);
+
+                        // Add x-axis label
+                        svg.append("text")
+                            .attr("class", "axis-label")
+                            .attr("x", width / 2 + 0.05 * width)
+                            .attr("y", height + 0.6 * height)
+                            .attr("text-anchor", "middle")
+                            .text("Time-of-day");
+
+                        // Add y-axis label
+                        svg.append("text")
+                            .attr("class", "axis-label")
+                            .attr("transform", "rotate(-90)")
+                            .attr("x", -height / 2 - 0.1 * height)
+                            .attr("y", width - 0.95 * width)
+                            .attr("text-anchor", "middle")
+                            .text("Traffic Volume");
+
+                        // Add legend labels and lines
+                        // Add legend labels
+                        svg.append("text")
+                            .attr("x", 0.2 * margin.left)
+                            .attr("y", 0.5 * margin.top)
+                            .attr("fill", "blue")
+                            .text("Observed")
+                            .classed("legend-label", true); // Add class for styling
+
+                        /* svg.append("line") // Add horizontal line marker for observed trend line
+                            .attr("x1", 1 * margin.left)
+                            .attr("y1", 0.4 * margin.top)
+                            .attr("x2", 1.5 * margin.left)
+                            .attr("y2", 0.4 * margin.top)
+                            .attr("stroke", "blue")
+                            .attr("stroke-width", 2); */
+
+                        svg.append("text")
+                            .attr("x", 1.8 * margin.left)
+                            .attr("y", 0.5 * margin.top)
+                            .attr("fill", "red")
+                            .text("Predicted")
+                            .classed("legend-label", true); // Add class for styling
+
+                        /* svg.append("line") // Add horizontal line marker for predicted trend line
+                            .attr("x1", 2.6 * margin.left)
+                            .attr("y1", 0.4 * margin.top)
+                            .attr("x2", 3.1 * margin.left)
+                            .attr("y2", 0.4 * margin.top)
+                            .attr("stroke", "red")
+                            .attr("stroke-width", 2); */
+
+                        // Add Paris_id label
+                        svg.append("text")
+                            .attr("x", width / 2 + margin.left)
+                            .attr("y", margin.top / 2)
+                            .attr("fill", "black")
+                            .text(`Detector: ${plotData.paris_id}`)
+                            .classed("legend-label", true);
+
+                        container.appendChild(svg.node());
+                        document.getElementById("plots").appendChild(container);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Function to update plot dimensions on window resize
+        function updatePlotDimensions() {
+            const plotsContainer = document.getElementById("plots");
+            plotsContainer.innerHTML = ''; // Clear existing plots
+            createPlots(); // Re-create plots with updated dimensions
+        }
+
+        // Initial creation of plots
+        createPlots();
+
+        // Add event listener for window resize event
+        window.addEventListener('resize', updatePlotDimensions);
+
+    </script>
+</body>
+
+</html>
