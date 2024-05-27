@@ -8,14 +8,12 @@ import os
 from dataclasses import dataclass
 import requests
 from tqdm import tqdm
-
 import pandas as pd
 
 from utils import setup_logging
-from config import URL, LINKS, INFERENCE_DATA_DATE, config_folder
+from config import URL, LINKS, INFERENCE_DATA_DATE, data_folder
 
-
-temp_path = os.path.join(config_folder, "../data/raw_data")
+temp_path = data_folder / "raw_data"
 
 logging = setup_logging(file_name="call_data_api.log")
 
