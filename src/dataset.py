@@ -1,11 +1,13 @@
+from abc import ABC, abstractmethod
+import random
 from itertools import groupby
 from operator import itemgetter
 from typing import List, Tuple
 import numpy as np
 import pandas as pd
 
-from abc import ABC, abstractmethod
-import random
+import joblib
+from sklearn.preprocessing import StandardScaler
 
 
 class Dataset:
@@ -54,7 +56,28 @@ class DataSplitter(Dataset):
         return train, test, val
 
 
-class TimeSeriesScaler:
+class DataScaler(ABC):
+    def __init__(self) -> None:
+        super().__init__()
+
+    @abstractmethod
+    def scaler_fit(self):
+        pass
+
+    @abstractmethod
+    def scaler_transform(self):
+        pass
+
+    @abstractmethod
+    def save_scaler(self):
+        pass
+
+    @abstractmethod
+    def load_scaler(self):
+        pass
+
+
+class TimeSeriesScaler(DataScaler):
 
     def __init__(
         self,
@@ -69,6 +92,7 @@ class TimeSeriesScaler:
         self.other_columns = other_columns
         self.original_target_column = original_target_column
         self.duplicated_target_column = duplicated_target_column
+        super().__init__()
 
     def copy_target_column(self, _df):
         _df.loc[_df.index, self.duplicated_target_column] = _df[
@@ -76,8 +100,12 @@ class TimeSeriesScaler:
         ]
         return _df
 
-    def scaler_fit(self, scaler, X):
-        self.scaler = scaler.fit(X[self.continous_features].values)
+    def scaler_fit(self, scaler_type, X):
+        if scaler_type == "minmax":
+            self.scaler = StandardScaler()
+        else:
+            raise NotImplementedError
+        self.scaler.fit(X[self.continous_features].values)
         return self.scaler
 
     def scaler_transform(self, X):
@@ -92,6 +120,13 @@ class TimeSeriesScaler:
             self.original_target_column
         ]
         return scaled_features_df
+
+    def save_scaler(self, path):
+        joblib.dump(self.scaler, path)
+
+    def load_scaler(self, path):
+        scaler = joblib.load(path)
+        self.scaler = scaler
 
 
 class TimeSeriesFormatter:
@@ -111,6 +146,13 @@ class TimeSeriesFormatter:
         self.dynamic_fs = features_dynamic
         self.auto_regressive = auto_regressive
         self.inference = inference
+
+    @staticmethod
+    def reshape_x(X, W=None, use_static=False):
+        X_reshaped = np.reshape(X, (X.shape[0], -1))
+        if use_static:
+            X_reshaped = np.hstack((W, X_reshaped))
+        return X_reshaped
 
     def split_sequences(
         self,
@@ -175,6 +217,11 @@ class TimeSeriesFormatter:
                         y_list.extend(y)
                         z_list.extend(z)
         if self.inference:
-            return W_list, X_list, z_list
+            return np.array(W_list), np.array(X_list), np.array(z_list)
         else:
-            return W_list, X_list, y_list, z_list
+            return (
+                np.array(W_list),
+                np.array(X_list),
+                np.array(y_list),
+                np.array(z_list),
+            )
