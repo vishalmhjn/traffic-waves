@@ -1,4 +1,3 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -7,7 +6,9 @@ import pickle
 
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, RepeatedKFold
+
+import xgboost as xgb
 
 
 class Model(ABC):
@@ -64,6 +65,38 @@ class KNNModel(Model):
         ]
         optimal_k = k_values[np.argmax(cv_scores)]
         return optimal_k
+
+    def save_model(self, path):
+        saved_model = open(path, "wb")
+        pickle.dump(self.model, saved_model)
+        saved_model.close()
+
+    def load_model(self, path):
+        self.model = pickle.load(open(path, "rb"))
+
+
+class XGBoostModel(Model):
+
+    def __init__(self, **kwargs) -> None:
+        self.model = xgb.XGBRegressor(**kwargs)
+
+    def train_model(self, X, y):
+        self.model.fit(
+            X,
+            y,
+            verbose=2,
+        )
+        return self.model
+
+    def predict_model(self, X):
+        return self.model.predict(X)
+
+    def cross_validation(self, X, y):
+        cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+        self.cv_mocel = cross_val_score(
+            self.model, X, y, scoring="neg_mean_absolute_error", cv=cv, n_jobs=-1
+        )
+        return self.cv_model
 
     def save_model(self, path):
         saved_model = open(path, "wb")

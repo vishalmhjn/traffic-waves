@@ -6,12 +6,12 @@ import pandas as pd
 
 from utils import setup_logging
 
-from config import (
+from config_data import (
     file_static_attributes,
     file_train_input,
     file_historical_trends,
     file_raw_input,
-    list_column_order,
+    LIST_COLUMN_ORDER,
     file_processed_input,
 )
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         file_static_attributes,
         file_raw_input,
         file_historical_trends,
-        list_column_order,
+        LIST_COLUMN_ORDER,
     )
 
     merged_df = fill_missing_values(df)

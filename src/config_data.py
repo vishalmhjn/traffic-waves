@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import os
 from pathlib import Path
 
 # API URL
@@ -7,35 +6,6 @@ URL = (
     "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/"
     "comptages-routiers-permanents/records"
 )
-
-# Previous day's input data i.e., to make predictions for today, we use yesterday's data
-INFERENCE_DATA_DATE = (datetime.today() - timedelta(1)).strftime("%Y-%m-%d")
-
-# Path handling
-
-# Define the base paths
-data_folder = Path("../data")
-
-# Define the specific paths using the base paths
-file_raw_input = data_folder / "raw_data" / f"raw_data_{INFERENCE_DATA_DATE}.csv"
-file_train_input = data_folder / "historical_data" / "paris_trunk_june_july.csv"
-file_static_attributes = data_folder / "processed_data" / "link_static_attributes.csv"
-file_historical_trends = data_folder / "processed_data" / "link_historical_trends.csv"
-file_processed_input = (
-    data_folder / "processed_data" / f"inference_data_{INFERENCE_DATA_DATE}.csv"
-)
-
-# column names
-list_column_order = [
-    "time_idx",
-    "day",
-    "hour",
-    "maxspeed",
-    "length",
-    "lanes",
-    "paris_id",
-    "q",
-]
 
 # Network detector IDs used to query the data
 LINKS = [
@@ -155,3 +125,39 @@ LINKS = [
     "5455",
     "5456",
 ]
+
+# Define the base paths
+BASE_PATH_DATA = Path("../data")
+
+# column names
+LIST_COLUMN_ORDER = [
+    "time_idx",
+    "day",
+    "hour",
+    "maxspeed",
+    "length",
+    "lanes",
+    "paris_id",
+    "q",
+]
+
+
+# Previous day's input data i.e., to make predictions for today, we use yesterday's data
+input_date = datetime.today() - timedelta(1)
+input_date_formatted = input_date.strftime("%Y-%m-%d")
+prediction_date = datetime.today()
+prediction_date_formatted = prediction_date.strftime("%Y-%m-%d")
+
+# Define the specific paths using the base paths
+file_raw_input = BASE_PATH_DATA / "raw_data" / f"raw_data_{input_date_formatted}.csv"
+file_train_input = BASE_PATH_DATA / "historical_data" / "paris_trunk_june_july.csv"
+file_model_train = BASE_PATH_DATA / "historical_data" / "paris_trunk_june_july.csv"
+file_static_attributes = (
+    BASE_PATH_DATA / "processed_data" / "link_static_attributes.csv"
+)
+file_historical_trends = (
+    BASE_PATH_DATA / "processed_data" / "link_historical_trends.csv"
+)
+file_processed_input = (
+    BASE_PATH_DATA / "processed_data" / f"inference_data_{input_date_formatted}.csv"
+)

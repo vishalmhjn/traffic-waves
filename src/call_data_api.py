@@ -7,13 +7,12 @@ This module provides functions for data collection from API.
 import os
 from dataclasses import dataclass
 import requests
-from tqdm import tqdm
 import pandas as pd
 
 from utils import setup_logging
-from config import URL, LINKS, INFERENCE_DATA_DATE, data_folder
+from config_data import URL, LINKS, input_date_formatted, BASE_PATH_DATA
 
-temp_path = data_folder / "raw_data"
+temp_path = BASE_PATH_DATA / "raw_data"
 
 logging = setup_logging(file_name="call_data_api.log")
 
@@ -65,7 +64,7 @@ class DataMerger:
             df = pd.read_csv(f"{self.read_path}/raw_data_{i}.csv")
             df["t_1h"] = pd.to_datetime(df["t_1h"])
 
-            if str(df["t_1h"].dt.date.min()) == INFERENCE_DATA_DATE:
+            if str(df["t_1h"].dt.date.min()) == input_date_formatted:
                 full_data_list.append(df)
             else:
                 logging.info("Data for %s detector is not available", i)
@@ -89,7 +88,7 @@ class DataMerger:
 
 def data_collector(limit=24, offset=0, timezone="Europe/Berlin"):
     """Wrapper fucntion to collect and save the data"""
-    for link in tqdm(LINKS):
+    for link in LINKS:
 
         # Define the query parameters
         params = {
@@ -109,7 +108,7 @@ def data_collector(limit=24, offset=0, timezone="Europe/Berlin"):
         api_handler.call_open_api()
 
     data_merger = DataMerger(
-        path=f"{temp_path}/raw_data_{INFERENCE_DATA_DATE}.csv",
+        path=f"{temp_path}/raw_data_{input_date_formatted}.csv",
         list_links=LINKS,
         read_path=temp_path,
     )

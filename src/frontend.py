@@ -7,7 +7,7 @@ import math
 import numpy as np
 import pandas as pd
 
-from config_interface import INFERENCE_PREDICTION_DATE, INFERENCE_INPUT_DATE
+from config_data import prediction_date, input_date
 
 
 class PlotFormatting(ABC):
@@ -20,8 +20,8 @@ class PlotFormatting(ABC):
 
 
 class DashboardData(PlotFormatting):
-    prediction_date = INFERENCE_PREDICTION_DATE
-    input_date = INFERENCE_INPUT_DATE
+    _prediction_date = prediction_date
+    _input_date = input_date
 
     def __init__(self, path_pt, path_pt_1, path_o_t_1, path_variance=None) -> None:
         self.path_predictions_t = path_pt
@@ -33,8 +33,8 @@ class DashboardData(PlotFormatting):
 
     @staticmethod
     def create_date_strings():
-        current_date = DashboardData.prediction_date.strftime("%d-%m-%Y")
-        previous_date = DashboardData.input_date.strftime("%d-%m-%Y")
+        current_date = DashboardData._prediction_date.strftime("%d-%m-%Y")
+        previous_date = DashboardData._input_date.strftime("%d-%m-%Y")
         return previous_date, current_date
 
     @classmethod
