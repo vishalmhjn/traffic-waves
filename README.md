@@ -25,7 +25,7 @@ make run
 
 Run the visualization app:
 ```bash
-python app.py run
+python app.py
 ```
 
 ## Pipeline components
