@@ -10,9 +10,7 @@ import requests
 import pandas as pd
 
 from utils import setup_logging
-from config_data import URL, LINKS, input_date_formatted, BASE_PATH_DATA
-
-temp_path = BASE_PATH_DATA / "raw_data"
+from config_data import URL, LINKS
 
 logging = setup_logging(file_name="call_data_api.log")
 
@@ -54,6 +52,7 @@ class DataMerger:
     path: str
     list_links: list
     read_path: str
+    date_formatted: str
 
     def merge_data(self):
         """
@@ -64,7 +63,7 @@ class DataMerger:
             df = pd.read_csv(f"{self.read_path}/raw_data_{i}.csv")
             df["t_1h"] = pd.to_datetime(df["t_1h"])
 
-            if str(df["t_1h"].dt.date.min()) == input_date_formatted:
+            if str(df["t_1h"].dt.date.min()) == self.date_formatted:
                 full_data_list.append(df)
             else:
                 logging.info("Data for %s detector is not available", i)
@@ -86,7 +85,13 @@ class DataMerger:
                 logging.info("File %s does not exist.", file_path)
 
 
-def data_collector(limit=24, offset=0, timezone="Europe/Berlin"):
+def data_collector(
+    raw_data_folder,
+    input_date,
+    limit=24,
+    offset=0,
+    timezone="Europe/Berlin",
+):
     """Wrapper fucntion to collect and save the data"""
     for link in LINKS:
 
@@ -101,20 +106,18 @@ def data_collector(limit=24, offset=0, timezone="Europe/Berlin"):
         }
         # Example of using the dataclasses
         api_handler = ParisAPIHandler(
-            url=URL, params=params, save_path=temp_path, link_id=link
+            url=URL, params=params, save_path=raw_data_folder, link_id=link
         )
 
         # Call the methods of the dataclasses
         api_handler.call_open_api()
 
     data_merger = DataMerger(
-        path=f"{temp_path}/raw_data_{input_date_formatted}.csv",
+        path=f"{raw_data_folder}/raw_data_{input_date}.csv",
         list_links=LINKS,
-        read_path=temp_path,
+        read_path=raw_data_folder,
+        date_formatted=input_date,
     )
     data_merger.merge_data()
     data_merger.clean_data()
-
-
-if __name__ == "__main__":
-    data_collector()
+    logging.info(f"Data for {input_date} downloaded successfully.")

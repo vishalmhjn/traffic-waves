@@ -5,15 +5,7 @@ import os
 import pandas as pd
 
 from utils import setup_logging
-
-from config_data import (
-    file_static_attributes,
-    file_train_input,
-    file_historical_trends,
-    file_raw_input,
-    LIST_COLUMN_ORDER,
-    file_processed_input,
-)
+from config_data import LIST_COLUMN_ORDER
 
 logging = setup_logging("logfile_datapreprocess.log")
 
@@ -106,7 +98,14 @@ def fill_missing_values(_df):
     return _df
 
 
-if __name__ == "__main__":
+def data_processor(
+    file_historical_trends,
+    file_static_attributes,
+    file_train_input,
+    file_raw_input,
+    file_processed_input,
+):
+    """wrapper function"""
     create_static_attributes(file_static_attributes, file_train_input)
     compute_historical_trends(file_historical_trends, file_train_input)
     df = merge_files(

@@ -23,6 +23,11 @@ Run the data collection, processing and machine learing pipeline:
 make run
 ```
 
+Run the visualization app:
+```bash
+python app.py run
+```
+
 ## Pipeline components
 
 The above command runs the following components:

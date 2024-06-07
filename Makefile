@@ -19,8 +19,4 @@ test:
 
 run:
 	source $(VENV) && cd src/ && \
-    $(PYTHON) call_data_api.py && \
-    $(PYTHON) process_data.py && \
-    $(PYTHON) train.py && \
-    $(PYTHON) predict.py && \
-    $(PYTHON) app.py
+    $(PYTHON) main.py
