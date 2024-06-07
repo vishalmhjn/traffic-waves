@@ -128,6 +128,7 @@ LINKS = [
 
 # Define the base paths
 BASE_PATH_DATA = Path("../data")
+PATH_PREDICTIONS = Path("../predictions")
 
 # column names
 LIST_COLUMN_ORDER = [
@@ -150,8 +151,10 @@ prediction_date_formatted = prediction_date.strftime("%Y-%m-%d")
 
 # Define the specific paths using the base paths
 file_raw_input = BASE_PATH_DATA / "raw_data" / f"raw_data_{input_date_formatted}.csv"
-file_train_input = BASE_PATH_DATA / "historical_data" / "paris_trunk_june_july.csv"
-file_model_train = BASE_PATH_DATA / "historical_data" / "paris_trunk_june_july.csv"
+file_train_input = BASE_PATH_DATA / "historical_data" / "sample_training_data.csv"
+file_model_train = BASE_PATH_DATA / "historical_data" / "sample_training_data.csv"
+file_sample_variance = BASE_PATH_DATA / "processed_data" / "df_var_2023.csv"
+
 file_static_attributes = (
     BASE_PATH_DATA / "processed_data" / "link_static_attributes.csv"
 )

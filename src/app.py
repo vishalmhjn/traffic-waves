@@ -1,17 +1,35 @@
 from flask import Flask, render_template
 import pandas as pd
+import argparse
 
-from config_data import input_date_formatted, prediction_date_formatted
+from config_data import (
+    PATH_PREDICTIONS,
+    input_date_formatted,
+    prediction_date_formatted,
+    file_processed_input,
+    file_sample_variance,
+)
 from frontend import DashboardData
 
 pd.options.mode.chained_assignment = None
 
-dashboard_object = DashboardData(
-    path_o_t_1=f"../data/processed_data/inference_data_{input_date_formatted}.csv",
-    path_pt_1=f"../predictions/knn_{input_date_formatted}.csv",
-    path_pt=f"../predictions/knn_{prediction_date_formatted}.csv",
-    path_variance=f"../data/variance/df_var_2023.csv",
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-m",
+    "--model",
+    help="type of machine learning model",
+    choices=["knn", "xgboost"],
+    default="knn",
 )
+args = parser.parse_args()
+
+dashboard_object = DashboardData(
+    path_o_t_1=file_processed_input,
+    path_pt_1=(PATH_PREDICTIONS / f"{args.model}_{input_date_formatted}.csv"),
+    path_pt=(PATH_PREDICTIONS / f"{args.model}_{prediction_date_formatted}.csv"),
+    path_variance=file_sample_variance,
+)
+
 
 dashboard_object.read_data()
 
