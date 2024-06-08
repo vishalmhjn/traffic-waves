@@ -1,10 +1,7 @@
-from config_data import file_model_train
-
 TRAINING_PARAMS = {
     "metric": "smape",
     "training": True,
-    "data_path": file_model_train,
-    "model_output_dir": "modeloutput/",
+    "model_output_dir": "model_output",
     "seed": 46,
     "test_proportion": 0.15,
     "validation_proportion": 0.15,
@@ -43,7 +40,6 @@ FEATURE_SETTINGS = {
 # Using the CONFIG dictionary
 metric = TRAINING_PARAMS["metric"]
 training = TRAINING_PARAMS["training"]
-data_path = TRAINING_PARAMS["data_path"]
 train_episodes = TRAINING_PARAMS["train_episodes"]
 
 dynamic_continous_features = FEATURE_SETTINGS["dynamic_continous_features"]

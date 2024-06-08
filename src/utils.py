@@ -3,6 +3,7 @@ from itertools import repeat
 
 import numpy as np
 import pandas as pd
+from datetime import datetime, timedelta
 
 
 def setup_logging(file_name="logfile.log"):
@@ -24,3 +25,12 @@ def predicitons_to_df(ph, z_test, y_test_hat):
     df_test["preds"] = np.ravel(y_test_hat)
     df_test["preds"] = df_test["preds"].astype(int)
     return df_test
+
+
+def format_dates(offset_days=0):
+    base_date = datetime.today() - timedelta(offset_days)
+    return base_date, base_date.strftime("%Y-%m-%d")
+
+
+def func_path_data(raw_folder, date_fmt, prefix_str):
+    return raw_folder / f"{prefix_str}_{date_fmt}.csv"

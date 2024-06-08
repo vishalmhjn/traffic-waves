@@ -1,16 +1,36 @@
-from flask import Flask, render_template, jsonify
-
+from flask import Flask, render_template
 import pandas as pd
-from config_interface import *
+import argparse
+
+from main import (
+    PATH_PREDICTIONS,
+    file_sample_variance,
+)
 from frontend import DashboardData
+from config_app import (
+    current_date_formatted,
+    previous_date_formatted,
+    file_processed_input,
+)
 
 pd.options.mode.chained_assignment = None
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-m",
+    "--model",
+    help="type of machine learning model",
+    choices=["knn", "xgboost"],
+    default="knn",
+)
+args = parser.parse_args()
+
+
 dashboard_object = DashboardData(
-    path_o_t_1=f"../data/processed_data/inference_data_{INFERENCE_INPUT_DATE_FMT}.csv",
-    path_pt_1=f"../predictions/knn_{INFERENCE_INPUT_DATE_FMT}.csv",
-    path_pt=f"../predictions/knn_{INFERENCE_PREDICTION_DATE_FMT}.csv",
-    path_variance=f"../data/variance/df_var_2023.csv",
+    path_o_t_1=file_processed_input,
+    path_pt_1=(PATH_PREDICTIONS / f"{args.model}_{previous_date_formatted}.csv"),
+    path_pt=(PATH_PREDICTIONS / f"{args.model}_{current_date_formatted}.csv"),
+    path_variance=file_sample_variance,
 )
 
 dashboard_object.read_data()
@@ -27,7 +47,7 @@ def index():
 def data():
     data_asset = dashboard_object.processing_pipeline()
 
-    return DashboardData.write_to_json("../frontend/data.json", data_asset)
+    return DashboardData.write_to_json(PATH_PREDICTIONS / "data.json", data_asset)
 
 
 @app.after_request

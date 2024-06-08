@@ -10,14 +10,12 @@ from config_model import (
     static_features,
     dynamic_features,
 )
-from config_data import prediction_date_formatted
 from utils import setup_logging
 from models import KNNModel, EvaluationMetrics, XGBoostModel
 from dataset import DataSplitter, TimeSeriesScaler, TimeSeriesFormatter
 
 # Set up logging
 logging = setup_logging("train.log")
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -29,9 +27,10 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-if __name__ == "__main__":
 
-    data_object = DataSplitter(TRAINING_PARAMS["data_path"])
+def model_trainer(path_train):
+    """wrapper for training recipe"""
+    data_object = DataSplitter(path_train)
     X_formatted = data_object.df
 
     for lb, ph in [(FORECASTING_PARAMS["lb"], FORECASTING_PARAMS["ph"])]:
@@ -58,7 +57,7 @@ if __name__ == "__main__":
             for df in (X_formatted_train, X_formatted_val, X_formatted_test)
         ]
 
-        scaler = time_series_object.scaler_fit("minmax", X_formatted_train)
+        _ = time_series_object.scaler_fit("minmax", X_formatted_train)
 
         (scaled_train, scaled_val, scaled_test) = [
             time_series_object.scaler_transform(df)
@@ -77,9 +76,6 @@ if __name__ == "__main__":
         W_test, X_test, y_test, z_test = series_formatter_obj.format_data(scaled_test)
 
         logging.info(f"Column order: {scaled_train.columns}")
-
-        lookback_timesteps = lb
-        prediction_horizon = ph
 
         X_train = TimeSeriesFormatter.reshape_x(X_train)
         X_val = TimeSeriesFormatter.reshape_x(X_val)
@@ -115,5 +111,6 @@ if __name__ == "__main__":
         test_rmse = EvaluationMetrics(y_test, y_test_hat).rmse()
         logging.info(f"RMSE on Test Set: {test_rmse}")
 
-        traffic_model.save_model(f"artifacts/{args.model}_model")
-        time_series_object.save_scaler("artifacts/minmax_scaler.gz")
+        model_output = TRAINING_PARAMS["model_output_dir"]
+        traffic_model.save_model(f"{model_output}/{args.model}_model")
+        time_series_object.save_scaler(f"{model_output}/minmax_scaler.gz")
