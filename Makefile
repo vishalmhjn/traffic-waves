@@ -20,3 +20,7 @@ test:
 run:
 	source $(VENV) && cd src/ && \
     $(PYTHON) main.py
+
+app:
+	source $(VENV) && cd src/ && \
+    $(PYTHON) app.py
