@@ -1,5 +1,3 @@
-import argparse
-
 from config_model import TRAINING_PARAMS, FORECASTING_PARAMS
 from config_model import (
     continous_features,
@@ -17,24 +15,14 @@ from dataset import DataSplitter, TimeSeriesScaler, TimeSeriesFormatter
 # Set up logging
 logging = setup_logging("train.log")
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-m",
-    "--model",
-    help="type of machine learning model",
-    choices=["knn", "xgboost"],
-    default="knn",
-)
-args = parser.parse_args()
 
-
-def model_trainer(path_train):
+def model_trainer(path_train, arg_model):
     """wrapper for training recipe"""
     data_object = DataSplitter(path_train)
-    X_formatted = data_object.df
+    _ = data_object.df
 
     for lb, ph in [(FORECASTING_PARAMS["lb"], FORECASTING_PARAMS["ph"])]:
-        det_ids = data_object.get_groups
+        _ = data_object.get_groups
 
         seed = TRAINING_PARAMS["seed"]
         validation_prop = TRAINING_PARAMS["validation_proportion"]
@@ -81,12 +69,12 @@ def model_trainer(path_train):
         X_val = TimeSeriesFormatter.reshape_x(X_val)
         X_test = TimeSeriesFormatter.reshape_x(X_test)
 
-        if args.model == "knn":
+        if arg_model == "knn":
             optimal_k = 2
             traffic_model = KNNModel(
                 n_neighbors=optimal_k, weights="uniform", algorithm="kd_tree", p=2
             )
-        elif args.model == "xgboost":
+        elif arg_model == "xgboost":
             traffic_model = XGBoostModel(
                 n_estimators=300,
                 max_depth=5,
@@ -112,5 +100,5 @@ def model_trainer(path_train):
         logging.info(f"RMSE on Test Set: {test_rmse}")
 
         model_output = TRAINING_PARAMS["model_output_dir"]
-        traffic_model.save_model(f"{model_output}/{args.model}_model")
+        traffic_model.save_model(f"{model_output}/{arg_model}_model")
         time_series_object.save_scaler(f"{model_output}/minmax_scaler.gz")

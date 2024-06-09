@@ -19,7 +19,7 @@ test:
 
 run:
 	source $(VENV) && cd src/ && \
-    $(PYTHON) main.py
+    $(PYTHON) main.py -m knn
 
 app:
 	source $(VENV) && cd src/ && \

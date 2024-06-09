@@ -1,7 +1,7 @@
 TRAINING_PARAMS = {
     "metric": "smape",
     "training": True,
-    "model_output_dir": "model_output",
+    "model_output_dir": "../model_output",
     "seed": 46,
     "test_proportion": 0.15,
     "validation_proportion": 0.15,
