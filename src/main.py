@@ -58,9 +58,7 @@ if __name__ == "__main__":
         )
 
         # run workflow
-        data_collector(
-            raw_data_folder, previous_date_formatted, offset=days_offset * 24
-        )
+        data_collector(raw_data_folder, previous_date_formatted, offset=date_delta * 24)
         data_processor(
             file_hist_trends,
             file_static_attr,
