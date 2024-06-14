@@ -19,8 +19,11 @@ test:
 
 run:
 	source $(VENV) && cd src/ && \
-    $(PYTHON) main.py -m knn
+    $(PYTHON) main.py -m knn -t
 
 app:
 	source $(VENV) && cd src/ && \
     $(PYTHON) app.py
+
+clean:
+	rm -rf $(ENV)

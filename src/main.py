@@ -31,19 +31,25 @@ parser.add_argument(
     choices=["knn", "xgboost"],
     default="knn",
 )
+parser.add_argument(
+    "-t",
+    "--train",
+    action="store_true",
+    help="Whether train the model of not",
+)
 args = parser.parse_args()
 
 if __name__ == "__main__":
 
     # train model
-    model_trainer(file_model_train, arg_model=args.model)
+    if args.train:
+        model_trainer(file_model_train, arg_model=args.model)
 
     # dates for t-n-1 and t-n days
-    for days_offset in reversed(range(0, 2)):
-        previous_date, previous_date_formatted = format_dates(
-            offset_days=days_offset + 1
-        )
-        current_date, current_date_formatted = format_dates(days_offset)
+    for date_delta in reversed(range(0, 2)):
+
+        previous_date, previous_date_formatted = format_dates(day_delta=date_delta + 1)
+        current_date, current_date_formatted = format_dates(date_delta)
         file_raw_input = func_path_data(
             raw_data_folder, previous_date_formatted, "raw_data"
         )
