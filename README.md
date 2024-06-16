@@ -18,7 +18,7 @@ make install
 
 ## Usage
 
-Run the data collection, processing and machine learing pipeline:
+Run the data collection, processing and machine learing pipeline (with default options):
 ```bash
 make run
 ```

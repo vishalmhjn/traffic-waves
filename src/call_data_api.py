@@ -62,11 +62,11 @@ class DataMerger:
         for i in self.list_links:
             df = pd.read_csv(f"{self.read_path}/raw_data_{i}.csv")
             df["t_1h"] = pd.to_datetime(df["t_1h"])
+            assert (
+                str(df["t_1h"].dt.date.min()) == self.date_formatted
+            ), f"Data for previous day is not available via API yet. For other days, manually set the offsets in API query."
 
-            if str(df["t_1h"].dt.date.min()) == self.date_formatted:
-                full_data_list.append(df)
-            else:
-                logging.info("Data for %s detector is not available", i)
+            full_data_list.append(df)
         full_data = pd.concat(full_data_list, axis=0)
         full_data.to_csv(self.path, index=False)
 

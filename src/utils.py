@@ -27,8 +27,8 @@ def predicitons_to_df(ph, z_test, y_test_hat):
     return df_test
 
 
-def format_dates(offset_days=0):
-    base_date = datetime.today() - timedelta(offset_days)
+def format_dates(day_delta=0):
+    base_date = datetime.today() - timedelta(day_delta)
     return base_date, base_date.strftime("%Y-%m-%d")
 
 

@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 
 from utils import format_dates, func_path_data, setup_logging
 
@@ -22,17 +23,33 @@ file_static_attr = processed_data_folder / "link_static_attributes.csv"
 file_hist_trends = processed_data_folder / "link_historical_trends.csv"
 file_sample_variance = processed_data_folder / "df_var_2023.csv"
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-m",
+    "--model",
+    help="type of machine learning model",
+    choices=["knn", "xgboost"],
+    default="knn",
+)
+parser.add_argument(
+    "-t",
+    "--train",
+    action="store_true",
+    help="Whether train the model of not",
+)
+args = parser.parse_args()
+
 if __name__ == "__main__":
 
     # train model
-    model_trainer(file_model_train)
+    if args.train:
+        model_trainer(file_model_train, arg_model=args.model)
 
     # dates for t-n-1 and t-n days
-    for days_offset in reversed(range(0, 2)):
-        previous_date, previous_date_formatted = format_dates(
-            offset_days=days_offset + 1
-        )
-        current_date, current_date_formatted = format_dates(days_offset)
+    for date_delta in reversed(range(0, 2)):
+
+        previous_date, previous_date_formatted = format_dates(day_delta=date_delta + 1)
+        current_date, current_date_formatted = format_dates(date_delta)
         file_raw_input = func_path_data(
             raw_data_folder, previous_date_formatted, "raw_data"
         )
@@ -41,9 +58,7 @@ if __name__ == "__main__":
         )
 
         # run workflow
-        data_collector(
-            raw_data_folder, previous_date_formatted, offset=days_offset * 24
-        )
+        data_collector(raw_data_folder, previous_date_formatted, offset=date_delta * 24)
         data_processor(
             file_hist_trends,
             file_static_attr,
@@ -55,4 +70,5 @@ if __name__ == "__main__":
             PATH_PREDICTIONS,
             file_processed_input,
             current_date_formatted,
+            args_model=args.model,
         )
