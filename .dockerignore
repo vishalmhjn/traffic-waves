@@ -1,0 +1,37 @@
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environment directory
+.env/
+venv/
+
+# Ignore version control directories
+.git/
+.gitignore
+.github
+
+# Ignore Docker-related files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Ignore logs, temporary files, and compiled files
+*.log
+*.sqlite3
+*.db
+*.swp
+*.swo
+*.DS_Store
+.coverage
+
+# Ignore local configuration and environment files
+.env
+.env.local
+
+# Ignore other folders
+assets
+aws
+aws-scripts
+purged
+src-deprecated
