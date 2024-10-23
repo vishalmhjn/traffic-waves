@@ -1,29 +1,38 @@
-# Ignore Python cache files
-__pycache__/
-*.py[cod]
+# Include any files or directories that you don't want to be copied to your
+# container here (e.g., local build artifacts, temporary files, etc.).
+#
+# For more help, visit the .dockerignore file reference guide at
+# https://docs.docker.com/go/build-context-dockerignore/
 
-# Ignore virtual environment directory
-.env/
-venv/
-
-# Ignore version control directories
-.git/
-.gitignore
-.github
-
-# Ignore Docker-related files
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Ignore logs, temporary files, and compiled files
-*.log
-*.sqlite3
-*.db
-*.swp
-*.swo
-*.DS_Store
-.coverage
+**/.DS_Store
+**/__pycache__
+**/.venv
+**/.classpath
+**/.dockerignore
+**/.env
+**/.git
+**/.github
+**/.gitignore
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.vscode
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/bin
+**/charts
+**/docker-compose*
+**/compose.y*ml
+**/Dockerfile*
+**/node_modules
+**/npm-debug.log
+**/obj
+**/secrets.dev.yaml
+**/values.dev.yaml
+LICENSE
+README.md
 
 # Ignore local configuration and environment files
 .env
@@ -35,3 +44,9 @@ aws
 aws-scripts
 purged
 src-deprecated
+frontend
+predictions
+purged
+model_output
+docker
+src/artifacts

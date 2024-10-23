@@ -1,0 +1,19 @@
+version: '3.8'
+
+volumes:
+  traffic-volume:
+    name: "traffic-volume"
+    driver: local
+
+services:
+  traffic-app:
+    image: traffic-image
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - traffic-volume:/app
+    container_name: traffic-app
+    stdin_open: true
+    tty: true

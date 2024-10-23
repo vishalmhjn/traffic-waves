@@ -31,7 +31,7 @@ def predictor(predictions_folder, file_processed_input, date_formatted, args_mod
         target_as_autoregressive_feature,
         target_column,
     )
-    _ = time_series_object.load_scaler("artifacts/minmax_scaler.gz")
+    _ = time_series_object.load_scaler(f"{model_output}/minmax_scaler.gz")
     logging.info(f"Scaler successfully loaded.")
 
     scaled_test = time_series_object.scaler_transform(X_formatted)
@@ -47,7 +47,7 @@ def predictor(predictions_folder, file_processed_input, date_formatted, args_mod
         traffic_model.load_model(f"{model_output}/{args_model}_model")
     elif args_model == "xgboost":
         traffic_model = XGBoostModel()
-        traffic_model.load_model(f"artifacts/{args_model}_model")
+        traffic_model.load_model(f"{model_output}/{args_model}_model")
     logging.info(f"Model {args_model} successfully loaded.")
 
     y_test_hat = traffic_model.predict_model(X_test)
