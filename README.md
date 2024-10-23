@@ -6,29 +6,6 @@ Traffic-Waves is a voluntary project focused on daily traffic predictions in Par
 
 The project leverages ML and DL techniques to analyze historical traffic data and make predictions for daily traffic patterns in Paris. This aids in providing insights for commuters and city planners alike.
 
-## Download and Install
-
-To install the requirements, run the following command in the parent:
-
-```bash
-git clone https://github.com/vishalmhjn/traffic-waves.git
-cd traffic-waves
-make install
-```
-
-## Usage
-
-Run the data collection, processing and machine learing pipeline (with default options):
-```bash
-make run
-```
-
-Run the visualization app:
-```bash
-make app
-```
-Visit `http://127.0.0.1:5000/` in the web-browser to open the visualization dashboard. 
-
 ## Pipeline components
 
 The above command runs the following components:
@@ -43,6 +20,37 @@ The above command runs the following components:
 
 **Visualization**:
 - **[Dashboard](src/app.py)**: Start a flask app to display the input data and predictions for all the links.
+
+## 1. Download and Install
+
+To install the requirements, run the following command in the parent:
+
+```bash
+git clone https://github.com/vishalmhjn/traffic-waves.git
+cd traffic-waves
+make install
+```
+
+### Usage
+
+Run the data collection, processing and machine learing pipeline (with default options):
+```bash
+make run
+```
+
+Run the visualization app:
+```bash
+make app
+```
+Visit `http://127.0.0.1:5000/` in the web-browser to open the visualization dashboard. 
+
+## 2. Building and running your application using Docker
+
+When you're ready with Docker installed, start your application by running:
+`docker compose up --build`.
+
+Your application will be available at http://localhost:5000.
+
 
 ## License
 **to be updated**
