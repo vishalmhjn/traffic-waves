@@ -1,24 +1,27 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12-slim
+# syntax=docker/dockerfile:1
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ARG PYTHON_VERSION=3.12.3
+FROM python:${PYTHON_VERSION}-slim as base
 
-# Set the working directory in the container
+# Prevents Python from writing pyc files
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Install build tools, including `make`
-RUN apt-get update && apt-get install -y build-essential make && rm -rf /var/lib/apt/lists/*
+# Install dependencies
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
 
-# Copy the requirements file into the container at /app
-COPY requirements.txt /app/
+# Copy the application files
+COPY . .
 
-# Install any dependencies in requirements.txt
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN mkdir ./predictions
+RUN mkdir ./model_output
 
-# Copy the entire project directory into the container at /app
-COPY . /app/
-
-# Expose the port the app runs on (5000 for Flask)
+# Expose the application port
 EXPOSE 5000
+
+WORKDIR /app/src
+
+CMD ["sh", "-c", "python main.py -t -m knn && python app.py"]
