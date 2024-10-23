@@ -64,7 +64,8 @@ class DataMerger:
             df["t_1h"] = pd.to_datetime(df["t_1h"])
             assert (
                 str(df["t_1h"].dt.date.min()) == self.date_formatted
-            ), f"Data for previous day is not available via API yet. For other days, manually set the offsets in API query."
+            ), f"Data for previous day is not available via API yet. For \
+                other days, manually set the offsets in API query."
 
             full_data_list.append(df)
         full_data = pd.concat(full_data_list, axis=0)
@@ -103,6 +104,8 @@ def data_collector(
             "order_by": "t_1h DESC",
             "timezone": timezone,
             "offset": offset,
+            # for date filtering: t_1h >= '2024-06-11 01:00:00' AND\
+            #  t_1h <= '2024-06-12 00:00:00' AND iu_ac in ('5169')
         }
         # Example of using the dataclasses
         api_handler = ParisAPIHandler(
