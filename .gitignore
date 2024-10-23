@@ -1,0 +1,16 @@
+src-deprecated/
+aws-scripts/
+
+!model_output/*.gitkeep
+# !*.gitkeep
+data/
+.vscode
+*.log
+src/__pycache__
+*.zip
+src/purge/
+predictions/
+.env
+src/artifacts/
+docker
+**/.DS_Store
