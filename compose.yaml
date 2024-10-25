@@ -1,5 +1,3 @@
-version: '3.8'
-
 volumes:
   traffic-volume:
     name: "traffic-volume"
@@ -13,7 +11,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - traffic-volume:/app
+      - traffic-volume:/home/modeler
     container_name: traffic-app
     stdin_open: true
     tty: true

@@ -7,21 +7,28 @@ FROM python:${PYTHON_VERSION}-slim as base
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+RUN groupadd -r modeler && useradd -r -g modeler modeler
+
+ENV HOME=/home/modeler
+
+USER modeler
+
+WORKDIR $HOME
 
 # Install dependencies
-COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
+COPY --chown=modeler:modeler requirements.txt .
+RUN python -m pip install --user -r requirements.txt
 
 # Copy the application files
-COPY . .
+COPY --chown=modeler:modeler . .
 
+# Create folder for saving outputs
 RUN mkdir ./predictions
 RUN mkdir ./model_output
 
 # Expose the application port
 EXPOSE 5000
 
-WORKDIR /app/src
+WORKDIR $HOME/src
 
 CMD ["sh", "-c", "python main.py -t -m knn && python app.py"]
